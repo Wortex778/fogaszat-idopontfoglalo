@@ -10,3 +10,15 @@ CREATE TABLE users (
     role VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    description TEXT,
+    price INT
+);
+
+INSERT INTO services (name, description, price) VALUES
+('Fogtömés', 'Fog javítása', 10000),
+('Fogkő eltávolítás', 'Tisztítás', 8000),
+('Gyökérkezelés', 'Fájdalmas fog kezelése', 20000);
