@@ -1,12 +1,11 @@
 <?php
+session_start();
+require_once "config/database.php";
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
 }
-
-session_start();
-require_once "config/database.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -24,11 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Hiba!";
     }
 }
-?>
-
-<?php
-session_start();
-require_once "config/database.php";
 ?>
 
 <h2>Időpont foglalás</h2>
