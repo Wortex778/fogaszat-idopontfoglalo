@@ -7,8 +7,10 @@ if (!isset($_SESSION["user_id"])) {
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$success = "";
+$error = "";
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION["user_id"];
     $service_id = $_POST["service_id"];
     $date = $_POST["date"];
@@ -18,31 +20,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$user_id', '$service_id', '$date', '$time')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "Sikeres foglalás!";
+        $success = "Sikeres foglalás!";
     } else {
-        echo "Hiba!";
+        $error = "Hiba történt a foglalás során!";
     }
 }
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Időpont foglalás</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<h2>Időpont foglalás</h2>
+<nav class="navbar">
+    <span>🦷 Fogászat</span>
+    <div>
+        <a href="dashboard.php">Főoldal</a>
+        <a href="my_appointments.php">Foglalásaim</a>
+        <a href="logout.php">Kijelentkezés</a>
+    </div>
+</nav>
 
-<form method="POST">
+<div class="container">
+    <h2>Időpont foglalás</h2>
 
-    Dátum: <input type="date" name="date"><br><br>
-    Idő: <input type="time" name="time"><br><br>
+    <?php if ($success): ?><div class="success"><?php echo $success; ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="error"><?php echo $error; ?></div><?php endif; ?>
 
-    Szolgáltatás:
-    <select name="service_id">
-        <?php
-        $services = $conn->query("SELECT * FROM services");
-        while($s = $services->fetch_assoc()) {
-            echo "<option value='".$s["id"]."'>".$s["name"]."</option>";
-        }
-        ?>
-    </select>
+    <form method="POST">
+        <label>Dátum:</label>
+        <input type="date" name="date" required>
 
-    <br><br>
+        <label>Idő:</label>
+        <input type="time" name="time" required>
 
-    <button type="submit">Foglalás</button>
-</form>
+        <label>Szolgáltatás:</label>
+        <select name="service_id">
+            <?php
+            $services = $conn->query("SELECT * FROM services");
+            while($s = $services->fetch_assoc()) {
+                echo "<option value='".$s["id"]."'>".$s["name"]."</option>";
+            }
+            ?>
+        </select>
+
+        <button type="submit">Foglalás</button>
+    </form>
+</div>
+
+</body>
+</html>

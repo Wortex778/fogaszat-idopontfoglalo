@@ -1,9 +1,10 @@
 <?php
-
 require_once "config/database.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$success = "";
+$error = "";
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST["name"];
     $email = $_POST["email"];
     $password = $_POST["password"];
@@ -12,30 +13,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$name', '$email', '$password', 'user')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "Sikeres regisztráció!";
+        $success = "Sikeres regisztráció! <a href='login.php'>Bejelentkezés</a>";
     } else {
-        echo "Hiba történt!";
+        $error = "Hiba történt a regisztráció során!";
     }
 }
-
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Regisztráció</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Regisztráció</h2>
+<div class="container">
+    <h2>Regisztráció</h2>
 
-<form method="POST">
-    Név: <input type="text" name="name"><br><br>
-    Email: <input type="email" name="email"><br><br>
-    Jelszó: <input type="password" name="password"><br><br>
+    <?php if ($success): ?><div class="success"><?php echo $success; ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="error"><?php echo $error; ?></div><?php endif; ?>
 
-    <button type="submit">Regisztráció</button>
-</form>
+    <form method="POST">
+        <label>Név:</label>
+        <input type="text" name="name" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Jelszó:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Regisztráció</button>
+    </form>
+
+    <p>Már van fiókod? <a href="login.php">Bejelentkezés</a></p>
+</div>
 
 </body>
 </html>
