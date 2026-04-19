@@ -18,8 +18,8 @@ if (isset($_SESSION["user_id"])) {
     <h1>🦷 Fogászati időpontfoglaló</h1>
     <p>Foglalj időpontot gyorsan és egyszerűen!</p>
 
-    <a href="login.php">Bejelentkezés</a>
-    <a href="register.php">Regisztráció</a>
+    <a href="login.php" class="btn">Bejelentkezés</a>
+    <a href="register.php" class="btn">Regisztráció</a>
 </div>
 
 </body>

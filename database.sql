@@ -1,8 +1,8 @@
-CREATE DATABASE dental_db;
+CREATE DATABASE IF NOT EXISTS dental_db;
 
 USE dental_db;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     email VARCHAR(100),
@@ -11,11 +11,19 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE services (
+CREATE TABLE IF NOT EXISTS services (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100),
     description TEXT,
     price INT
+);
+
+CREATE TABLE IF NOT EXISTS appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    service_id INT,
+    date DATE,
+    time TIME
 );
 
 INSERT INTO services (name, description, price) VALUES

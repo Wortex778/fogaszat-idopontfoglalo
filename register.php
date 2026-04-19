@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sss", $name, $email, $password);
 
         if ($stmt->execute()) {
-            $success = "Sikeres regisztráció! <a href='login.php'>Bejelentkezés</a>";
+            $success = "Sikeres regisztráció! ";
         } else {
             $error = "Hiba történt!";
         }
@@ -58,7 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Regisztráció</button>
     </form>
 
-    <p>Már van fiókod? <a href="login.php">Bejelentkezés</a></p>
+    <p>Már van fiókod?</p>
+    <p><a href="login.php" class="btn" >Bejelentkezés</a></p>
 </div>
 
 </body>

@@ -62,7 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Belépés</button>
     </form>
 
-    <p>Még nincs fiókod? <a href="register.php">Regisztráció</a></p>
+    <p><a> Még nincs fiókod?</a></p>
+    <p>  <a href="register.php" class="btn">Regisztráció</a></p>
 </div>
 
 </body>
