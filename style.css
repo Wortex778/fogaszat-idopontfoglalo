@@ -200,3 +200,38 @@ tr:hover {
     box-shadow: 0 12px 25px rgba(0,0,0,0.15);
 }
 
+/* STATISZTIKA BLOKK */
+.stats {
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff0f6, #ffe0ec);
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    text-align: left;
+}
+
+.stats h3 {
+    color: #d63384;
+    margin-bottom: 15px;
+}
+
+.stats p {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.stats ul {
+    list-style: none;
+    padding: 0;
+}
+
+.stats li {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    font-weight: bold;
+}

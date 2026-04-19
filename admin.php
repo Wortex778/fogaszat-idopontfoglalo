@@ -2,7 +2,6 @@
 session_start();
 require_once "config/database.php";
 
-// csak admin léphet be
 if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
     header("Location: login.php");
     exit();
@@ -27,6 +26,16 @@ $sql = "SELECT appointments.id, users.name, services.name AS service, appointmen
         JOIN services ON appointments.service_id = services.id";
 
 $result = $conn->query($sql);
+
+// 📊 STATISZTIKA
+$total = $conn->query("SELECT COUNT(*) as total FROM appointments")->fetch_assoc();
+
+$stats = $conn->query("
+    SELECT services.name, COUNT(*) as db
+    FROM appointments
+    JOIN services ON appointments.service_id = services.id
+    GROUP BY service_id
+");
 ?>
 
 <!DOCTYPE html>
@@ -47,6 +56,21 @@ $result = $conn->query($sql);
 
 <div class="container">
     <h2>Foglalások</h2>
+
+   <div class="stats">
+    <h3>📊 Statisztika</h3>
+
+    <p>Összes foglalás: <strong><?php echo $total["total"]; ?></strong></p>
+
+    <ul>
+    <?php while($row = $stats->fetch_assoc()): ?>
+        <li>
+            <span><?php echo $row["name"]; ?></span>
+            <span><?php echo $row["db"]; ?> db</span>
+        </li>
+    <?php endwhile; ?>
+    </ul>
+</div>
 
     <table>
         <tr>
