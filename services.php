@@ -14,8 +14,7 @@ $result = $conn->query($sql);
 <body>
 
 <nav class="navbar">
-        <a href="dashboard.php" class="logo">🦷 Fogászat</a>
-
+    <a href="dashboard.php" class="logo">🦷 Fogászat</a>
     <div>
         <a href="book.php">Foglalás</a>
         <a href="logout.php">Kijelentkezés</a>
@@ -23,22 +22,25 @@ $result = $conn->query($sql);
 </nav>
 
 <div class="container">
+
+    <div class="hero">
+        <h1>🦷 Szolgáltatásaink</h1>
+        <p>Modern fogászati kezelések magas színvonalon</p>
+        <a href="book.php" class="btn">Időpont foglalás</a>
+    </div>
+
     <h2>Szolgáltatások</h2>
 
-    <table>
-        <tr>
-            <th>Szolgáltatás</th>
-            <th>Leírás</th>
-            <th>Ár</th>
-        </tr>
+    <div class="services">
         <?php while($row = $result->fetch_assoc()): ?>
-        <tr>
-            <td><?php echo $row["name"]; ?></td>
-            <td><?php echo $row["description"]; ?></td>
-            <td><?php echo $row["price"]; ?> Ft</td>
-        </tr>
+            <a href="service_detail.php?id=<?php echo $row['id']; ?>" class="service-card">
+                <h3><?php echo $row["name"]; ?></h3>
+                <p><?php echo $row["description"]; ?></p>
+                <div class="price"><?php echo $row["price"]; ?> Ft</div>
+            </a>
         <?php endwhile; ?>
-    </table>
+    </div>
+
 </div>
 
 </body>

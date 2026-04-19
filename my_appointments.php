@@ -9,7 +9,7 @@ if (!isset($_SESSION["user_id"])) {
 
 $user_id = $_SESSION["user_id"];
 
-$sql = "SELECT appointments.id, services.name, appointments.date, appointments.time
+$sql = "SELECT appointments.id, services.name, appointments.date, appointments.time, appointments.status
         FROM appointments
         JOIN services ON appointments.service_id = services.id
         WHERE appointments.user_id = '$user_id'
@@ -42,17 +42,38 @@ $result = $conn->query($sql);
             <th>Szolgáltatás</th>
             <th>Dátum</th>
             <th>Idő</th>
+            <th>Státusz</th>
             <th>Törlés</th>
         </tr>
+
         <?php while($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?php echo $row["name"]; ?></td>
             <td><?php echo $row["date"]; ?></td>
             <td><?php echo $row["time"]; ?></td>
-            <td><a href="delete.php?id=<?php echo $row["id"]; ?>">🗑 Törlés</a></td>
+
+            <td>
+                <?php
+                if ($row["status"] == "elfogadva") {
+                    echo "<span style='color:green;'> elfogadva</span>";
+                } elseif ($row["status"] == "elutasítva") {
+                    echo "<span style='color:red;'> elutasítva</span>";
+                } else {
+                    echo "<span style='color:orange;'> függő</span>";
+                }
+                ?>
+            </td>
+
+            <td>
+                <a href="delete.php?id=<?php echo $row["id"]; ?>"
+                onclick="return confirm('Biztos törlöd ezt a foglalást?')">
+                🗑 Törlés
+            </a>
+            </td>
         </tr>
         <?php endwhile; ?>
     </table>
+
     <?php else: ?>
         <p>Nincs még foglalásod. <a href="book.php">Foglalj időpontot!</a></p>
     <?php endif; ?>
