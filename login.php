@@ -17,11 +17,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $user = $result->fetch_assoc();
 
-        // Jelszó ellenőrzés (titkosított)
+        // Jelszó ellenőrzés
         if (password_verify($password, $user["password"])) {
 
             $_SESSION["user_id"] = $user["id"];
             $_SESSION["user_name"] = $user["name"];
+            $_SESSION["role"] = $user["role"]; // ✅ IDE KELL
 
             header("Location: dashboard.php");
             exit();

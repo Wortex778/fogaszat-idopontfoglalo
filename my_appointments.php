@@ -26,9 +26,8 @@ $result = $conn->query($sql);
 <body>
 
 <nav class="navbar">
-    <span>🦷 Fogászat</span>
+    <a href="dashboard.php" class="logo">🦷 Fogászat</a>
     <div>
-        <a href="dashboard.php">Főoldal</a>
         <a href="book.php">Új foglalás</a>
         <a href="logout.php">Kijelentkezés</a>
     </div>
