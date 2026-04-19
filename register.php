@@ -5,17 +5,29 @@ $success = "";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     $name = $_POST["name"];
     $email = $_POST["email"];
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users (name, email, password, role) 
-            VALUES ('$name', '$email', '$password', 'user')";
+    // email ellenőrzés
+    $check = $conn->prepare("SELECT id FROM users WHERE email=?");
+    $check->bind_param("s", $email);
+    $check->execute();
+    $res = $check->get_result();
 
-    if ($conn->query($sql) === TRUE) {
-        $success = "Sikeres regisztráció! <a href='login.php'>Bejelentkezés</a>";
+    if ($res->num_rows > 0) {
+        $error = "Ez az email már létezik!";
     } else {
-        $error = "Hiba történt a regisztráció során!";
+
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'user')");
+        $stmt->bind_param("sss", $name, $email, $password);
+
+        if ($stmt->execute()) {
+            $success = "Sikeres regisztráció! <a href='login.php'>Bejelentkezés</a>";
+        } else {
+            $error = "Hiba történt!";
+        }
     }
 }
 ?>

@@ -11,7 +11,11 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
 // törlés
 if (isset($_GET["delete"])) {
     $id = $_GET["delete"];
-    $conn->query("DELETE FROM appointments WHERE id='$id'");
+
+    $stmt = $conn->prepare("DELETE FROM appointments WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+
     header("Location: admin.php");
     exit();
 }

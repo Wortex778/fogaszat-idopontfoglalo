@@ -75,21 +75,22 @@ h1, h2, h3 {
     color: #ff69b4;
 }
 
-/* BUTTONS */
-.btn {
+/* BUTTONS (MINDKETTŐT KEZELI) */
+.btn, button {
     display: inline-block;
     padding: 12px 24px;
     margin: 10px;
     background: linear-gradient(135deg, #ff69b4, #d63384);
     color: white;
     text-decoration: none;
+    border: none;
     border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
-.btn:hover {
+.btn:hover, button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }

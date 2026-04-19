@@ -22,20 +22,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($date < date("Y-m-d")) {
         $error = "Nem foglalhatsz múltbeli időpontra!";
+    } elseif ($time < "08:00" || $time > "16:00") {
+        $error = "Csak 08:00–16:00 között foglalhatsz!";
     } else {
 
-        $check = "SELECT * FROM appointments 
-                  WHERE date='$date' AND time='$time'";
-        $result = $conn->query($check);
+        $stmt = $conn->prepare("SELECT id FROM appointments WHERE date=? AND time=?");
+        $stmt->bind_param("ss", $date, $time);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $error = "Ez az időpont már foglalt!";
         } else {
 
-            $sql = "INSERT INTO appointments (user_id, service_id, date, time)
-                    VALUES ('$user_id', '$service_id', '$date', '$time')";
+            $stmt = $conn->prepare("INSERT INTO appointments (user_id, service_id, date, time) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iiss", $user_id, $service_id, $date, $time);
 
-            if ($conn->query($sql) === TRUE) {
+            if ($stmt->execute()) {
                 $success = "Sikeres foglalás!";
             } else {
                 $error = "Hiba történt!";
