@@ -9,7 +9,6 @@ if (!isset($_SESSION["user_id"])) {
 
 $user_id = $_SESSION["user_id"];
 
-// ✅ SQL OK
 $sql = "SELECT appointments.id, services.name, doctors.name AS doctor,
         appointments.date, appointments.time, appointments.status
         FROM appointments
@@ -60,11 +59,11 @@ $result = $conn->query($sql);
             <td>
                 <?php
                 if ($row["status"] == "elfogadva") {
-                    echo "<span style='color:green;'>🟢 elfogadva</span>";
+                    echo "<span style='color:green;'> elfogadva</span>";
                 } elseif ($row["status"] == "elutasítva") {
-                    echo "<span style='color:red;'>🔴 elutasítva</span>";
+                    echo "<span style='color:red;'> elutasítva</span>";
                 } else {
-                    echo "<span style='color:orange;'>🟡 függő</span>";
+                    echo "<span style='color:orange;'> függő</span>";
                 }
                 ?>
             </td>

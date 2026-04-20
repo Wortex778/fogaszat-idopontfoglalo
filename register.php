@@ -10,7 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
-    // email ellenőrzés
     $check = $conn->prepare("SELECT id FROM users WHERE email=?");
     $check->bind_param("s", $email);
     $check->execute();

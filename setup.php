@@ -10,7 +10,6 @@ if (!$sql) {
     die(" Nem található a database.sql fájl!");
 }
 
-// Lekérdezések szétbontása
 $queries = explode(";", $sql);
 
 $success = 0;

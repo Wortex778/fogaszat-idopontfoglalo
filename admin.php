@@ -7,7 +7,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
     exit();
 }
 
-// státusz módosítás
 if (isset($_GET["approve"])) {
     $id = $_GET["approve"];
     $conn->query("UPDATE appointments SET status='elfogadva' WHERE id=$id");
@@ -22,7 +21,6 @@ if (isset($_GET["reject"])) {
     exit();
 }
 
-// törlés
 if (isset($_GET["delete"])) {
     $id = $_GET["delete"];
 
@@ -34,7 +32,6 @@ if (isset($_GET["delete"])) {
     exit();
 }
 
-// 🔥 JAVÍTOTT SQL
 $sql = "SELECT appointments.id, users.name, services.name AS service, 
                doctors.name AS doctor,
                appointments.date, appointments.time, appointments.status
