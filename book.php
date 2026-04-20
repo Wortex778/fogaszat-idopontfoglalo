@@ -2,17 +2,16 @@
 session_start();
 require_once "config/database.php";
 
-// AJAX – időpontok
 if (isset($_GET["ajax"])) {
 
     $date = $_GET["date"] ?? '';
 
-    $booked = [];
     $stmt = $conn->prepare("SELECT time FROM appointments WHERE date=?");
     $stmt->bind_param("s", $date);
     $stmt->execute();
     $res = $stmt->get_result();
 
+    $booked = [];
     while ($row = $res->fetch_assoc()) {
         $booked[] = $row["time"];
     }
@@ -28,21 +27,21 @@ if (isset($_GET["ajax"])) {
     exit();
 }
 
-// LOGIN CHECK
+
 if (!isset($_SESSION["user_id"])) {
-    header("Location: login.php");
+    header("Location: /fogaszat/login.php");
     exit();
 }
 
 $success = "";
 $error = "";
-
-$selected_date = isset($_POST["date"]) ? $_POST["date"] : date("Y-m-d");
+$selected_date = $_POST["date"] ?? date("Y-m-d");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $user_id = $_SESSION["user_id"];
     $service_id = $_POST["service_id"];
+    $doctor_id = $_POST["doctor_id"];
     $date = $_POST["date"];
     $time = $_POST["time"];
 
@@ -52,8 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Csak 08:00–16:00 között foglalhatsz!";
     } else {
 
-        // 🔥 szolgáltatás időtartam
-        $stmt = $conn->prepare("SELECT duration FROM services WHERE id=?");
+        $stmt = $conn->prepare("SELECT name, duration FROM services WHERE id=?");
         $stmt->bind_param("i", $service_id);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -61,7 +59,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $duration = $service["duration"] ?? 60;
 
-        // 🔥 foglalások lekérése
         $stmt = $conn->prepare("SELECT time FROM appointments WHERE date=?");
         $stmt->bind_param("s", $date);
         $stmt->execute();
@@ -72,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $booked[] = $row["time"];
         }
 
-        // 🔥 ütközés ellenőrzés
         $start = strtotime($time);
         $end = $start + ($duration * 60);
 
@@ -89,15 +85,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($conflict) {
-            $error = "Ez az időpont ütközik egy másik foglalással!";
+            $error = "Ez az időpont ütközik!";
         } else {
 
-            // ✅ INSERT
-            $stmt = $conn->prepare("INSERT INTO appointments (user_id, service_id, date, time, status) VALUES (?, ?, ?, ?, 'függő')");
-            $stmt->bind_param("iiss", $user_id, $service_id, $date, $time);
+            $stmt = $conn->prepare("
+                INSERT INTO appointments 
+                (user_id, service_id, doctor_id, date, time, status) 
+                VALUES (?, ?, ?, ?, ?, 'függő')
+            ");
+            $stmt->bind_param("iiiss", $user_id, $service_id, $doctor_id, $date, $time);
 
             if ($stmt->execute()) {
-                $success = "Sikeres foglalás!";
+                $success = "Sikeres foglalás: " . $service["name"];
             } else {
                 $error = "Hiba történt!";
             }
@@ -115,10 +114,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <nav class="navbar">
-    <a href="dashboard.php" class="logo">🦷 Fogászat</a>   
+    <a href="/fogaszat/dashboard.php" class="logo">🦷 Fogászat</a>   
     <div>
-        <a href="my_appointments.php">Foglalásaim</a>
-        <a href="logout.php">Kijelentkezés</a>
+        <a href="/fogaszat/my_appointments.php">Foglalásaim</a>
+        <a href="/fogaszat/logout.php">Kijelentkezés</a>
     </div>
 </nav>
 
@@ -142,14 +141,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <label>Időpont:</label>
         <select id="time" name="time" required>
-
         <?php
-        $booked = [];
         $stmt = $conn->prepare("SELECT time FROM appointments WHERE date=?");
         $stmt->bind_param("s", $selected_date);
         $stmt->execute();
         $res = $stmt->get_result();
 
+        $booked = [];
         while ($row = $res->fetch_assoc()) {
             $booked[] = $row["time"];
         }
@@ -166,21 +164,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <label>Szolgáltatás:</label>
         <select name="service_id" required>
-
         <?php
         $selected = $_GET["service_id"] ?? null;
 
         $services = $conn->query("SELECT * FROM services");
         while ($s = $services->fetch_assoc()) {
-
             $isSelected = ($selected == $s["id"]) ? "selected" : "";
-
             echo "<option value='{$s["id"]}' $isSelected>{$s["name"]} ({$s["duration"]} perc)</option>";
         }
         ?>
         </select>
 
-        
+        <label>Orvos:</label>
+        <select name="doctor_id" required>
+        <?php
+        $service_id = $_GET["service_id"] ?? 1;
+
+        $stmt = $conn->prepare("SELECT * FROM doctors WHERE service_id=?");
+        $stmt->bind_param("i", $service_id);
+        $stmt->execute();
+        $docs = $stmt->get_result();
+        while ($d = $docs->fetch_assoc()) {
+            echo "<option value='{$d["id"]}'>{$d["name"]} ({$d["specialization"]})</option>";
+        }
+        ?>
+        </select>
 
         <button type="submit">Foglalás</button>
 
@@ -189,31 +197,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <script>
 document.getElementById("date").addEventListener("change", function() {
+
     let date = this.value;
 
-    fetch("book.php?ajax=1&date=" + date)
+    fetch("/fogaszat/book.php?ajax=1&date=" + date)
     .then(res => res.text())
     .then(data => {
         document.getElementById("time").innerHTML = data;
     });
+
 });
 
-    const serviceSelect = document.querySelector("select[name='service_id']");
-    const durationText = document.getElementById("durationText");
+document.querySelector("select[name='service_id']").addEventListener("change", function() {
 
-    function updateDuration() {
-        const text = serviceSelect.options[serviceSelect.selectedIndex].text;
-        const match = text.match(/\((.*?)\)/);
+    let service = this.value;
 
-        if (match) {
-            durationText.innerText = "⏱ Időtartam: " + match[1];
-        }
-    }
+    fetch("/fogaszat/get_doctors.php?service_id=" + service)
+    .then(res => res.text())
+    .then(data => {
+        document.querySelector("select[name='doctor_id']").innerHTML = data;
+    });
 
-    serviceSelect.addEventListener("change", updateDuration);
+});
 
+window.addEventListener("load", function() {
+    let service = document.querySelector("select[name='service_id']").value;
 
-    updateDuration();
+    fetch("/fogaszat/get_doctors.php?service_id=" + service)
+    .then(res => res.text())
+    .then(data => {
+        document.querySelector("select[name='doctor_id']").innerHTML = data;
+    });
+});
+
 </script>
 
 </body>

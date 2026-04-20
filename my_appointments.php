@@ -9,9 +9,12 @@ if (!isset($_SESSION["user_id"])) {
 
 $user_id = $_SESSION["user_id"];
 
-$sql = "SELECT appointments.id, services.name, appointments.date, appointments.time, appointments.status
+// ✅ SQL OK
+$sql = "SELECT appointments.id, services.name, doctors.name AS doctor,
+        appointments.date, appointments.time, appointments.status
         FROM appointments
         JOIN services ON appointments.service_id = services.id
+        JOIN doctors ON appointments.doctor_id = doctors.id
         WHERE appointments.user_id = '$user_id'
         ORDER BY appointments.date, appointments.time";
 
@@ -40,6 +43,7 @@ $result = $conn->query($sql);
     <table>
         <tr>
             <th>Szolgáltatás</th>
+            <th>Orvos</th>
             <th>Dátum</th>
             <th>Idő</th>
             <th>Státusz</th>
@@ -49,26 +53,27 @@ $result = $conn->query($sql);
         <?php while($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?php echo $row["name"]; ?></td>
+            <td><?php echo $row["doctor"]; ?></td>
             <td><?php echo $row["date"]; ?></td>
             <td><?php echo $row["time"]; ?></td>
 
             <td>
                 <?php
                 if ($row["status"] == "elfogadva") {
-                    echo "<span style='color:green;'> elfogadva</span>";
+                    echo "<span style='color:green;'>🟢 elfogadva</span>";
                 } elseif ($row["status"] == "elutasítva") {
-                    echo "<span style='color:red;'> elutasítva</span>";
+                    echo "<span style='color:red;'>🔴 elutasítva</span>";
                 } else {
-                    echo "<span style='color:orange;'> függő</span>";
+                    echo "<span style='color:orange;'>🟡 függő</span>";
                 }
                 ?>
             </td>
 
             <td>
                 <a href="delete.php?id=<?php echo $row["id"]; ?>"
-                onclick="return confirm('Biztos törlöd ezt a foglalást?')">
-                🗑 Törlés
-            </a>
+                   onclick="return confirm('Biztos törlöd ezt a foglalást?')">
+                   🗑 Törlés
+                </a>
             </td>
         </tr>
         <?php endwhile; ?>

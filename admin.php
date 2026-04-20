@@ -7,6 +7,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
     exit();
 }
 
+// státusz módosítás
 if (isset($_GET["approve"])) {
     $id = $_GET["approve"];
     $conn->query("UPDATE appointments SET status='elfogadva' WHERE id=$id");
@@ -21,6 +22,7 @@ if (isset($_GET["reject"])) {
     exit();
 }
 
+// törlés
 if (isset($_GET["delete"])) {
     $id = $_GET["delete"];
 
@@ -32,14 +34,18 @@ if (isset($_GET["delete"])) {
     exit();
 }
 
+// 🔥 JAVÍTOTT SQL
 $sql = "SELECT appointments.id, users.name, services.name AS service, 
+               doctors.name AS doctor,
                appointments.date, appointments.time, appointments.status
         FROM appointments
         JOIN users ON appointments.user_id = users.id
-        JOIN services ON appointments.service_id = services.id";
+        JOIN services ON appointments.service_id = services.id
+        JOIN doctors ON appointments.doctor_id = doctors.id";
 
 $result = $conn->query($sql);
 
+// stat
 $total = $conn->query("SELECT COUNT(*) as total FROM appointments")->fetch_assoc();
 
 $stats = $conn->query("
@@ -72,47 +78,63 @@ $stats = $conn->query("
     <div class="stats">
         <h3>📊 Statisztika</h3>
 
-        <p>Összes foglalás: <strong><?php echo $total["total"]; ?></strong></p>
+        <div class="stats-grid">
 
-        <ul>
-        <?php while($row = $stats->fetch_assoc()): ?>
-            <li>
-                <span><?php echo $row["name"]; ?></span>
-                <span><?php echo $row["db"]; ?> db</span>
-            </li>
-        <?php endwhile; ?>
-        </ul>
+            <div class="stat-card main">
+                <h4>Összes foglalás</h4>
+                <p><?php echo $total["total"]; ?></p>
+            </div>
+
+            <?php while($row = $stats->fetch_assoc()): ?>
+                <div class="stat-card">
+                    <h4><?php echo $row["name"]; ?></h4>
+                    <p><?php echo $row["db"]; ?> db</p>
+                </div>
+            <?php endwhile; ?>
+
+        </div>
     </div>
 
     <table>
         <tr>
             <th>Felhasználó</th>
             <th>Szolgáltatás</th>
+            <th>Orvos</th>
             <th>Dátum</th>
             <th>Idő</th>
             <th>Státusz</th>
             <th>Művelet</th>
         </tr>
 
-        <?php
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>
-                    <td>{$row["name"]}</td>
-                    <td>{$row["service"]}</td>
-                    <td>{$row["date"]}</td>
-                    <td>{$row["time"]}</td>
-                    <td>{$row["status"]}</td>
-                    <td>
-                        <a href='admin.php?approve={$row["id"]}'>✔</a>
-                        <a href='admin.php?reject={$row["id"]}'>❌</a>
-                        <a href='admin.php?delete={$row["id"]}'
-                           onclick=\"return confirm('Biztos törlöd?')\">
-                           🗑
-                        </a>
-                    </td>
-                  </tr>";
-        }
-        ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+            <td><?php echo $row["name"]; ?></td>
+            <td><?php echo $row["service"]; ?></td>
+            <td><?php echo $row["doctor"]; ?></td>
+            <td><?php echo $row["date"]; ?></td>
+            <td><?php echo $row["time"]; ?></td>
+
+            <td>
+                <?php
+                if ($row["status"] == "elfogadva") {
+                    echo "<span style='color:green;'> elfogadva</span>";
+                } elseif ($row["status"] == "elutasítva") {
+                    echo "<span style='color:red;'> elutasítva</span>";
+                } else {
+                    echo "<span style='color:orange;'> függő</span>";
+                }
+                ?>
+            </td>
+
+            <td>
+                <a href="admin.php?approve=<?php echo $row["id"]; ?>">✔</a>
+                <a href="admin.php?reject=<?php echo $row["id"]; ?>">❌</a>
+                <a href="admin.php?delete=<?php echo $row["id"]; ?>"
+                   onclick="return confirm('Biztos törlöd?')">🗑</a>
+            </td>
+        </tr>
+        <?php endwhile; ?>
+
     </table>
 </div>
 

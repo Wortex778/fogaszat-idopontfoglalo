@@ -26,6 +26,18 @@ CREATE TABLE IF NOT EXISTS appointments (
     time TIME
 );
 
+CREATE TABLE doctors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    specialization VARCHAR(100)
+);
+
+CREATE TABLE doctor_services (
+    doctor_id INT,
+    service_id INT
+);
+
+
 INSERT INTO services (name, description, price) VALUES
 ('Fogtömés', 'Fog javítása', 10000),
 ('Fogkő eltávolítás', 'Tisztítás', 8000),

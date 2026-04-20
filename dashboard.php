@@ -51,5 +51,23 @@ if (!isset($_SESSION["user_id"])) {
     </div>
 </div>
 
+<div class="about">
+    <h2>Rólunk</h2>
+
+    <p>
+        Rendelőnk modern fogászati kezeléseket kínál barátságos környezetben.
+        Célunk, hogy pácienseink számára fájdalommentes és magas színvonalú ellátást biztosítsunk.
+    </p>
+
+    <p>
+        Tapasztalt szakembereink a legújabb technológiákat alkalmazzák,
+        legyen szó esztétikai vagy általános fogászati kezelésekről.
+    </p>
+
+    <p>
+        Nálunk a páciens az első — fontos számunkra a bizalom és a hosszú távú elégedettség.
+    </p>
+</div>
+
 </body>
 </html>
